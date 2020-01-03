@@ -36,7 +36,7 @@ for(j in 1:nrow(data_80_14))
  sigma_tmp <- sigma_tmp + (moy_max_1-data_80_14$`Température maximale`[j])^2
         
 }
-sigma_max_1 <- sigma_tmp/(nrow(data_80_14)-1)
+sigma_max_1 <- sqrt(sigma_tmp/(nrow(data_80_14)-1))
 
 
 #Moyenne de la température moyenne
@@ -49,7 +49,7 @@ for(j in 1:nrow(data_80_14))
         sigma_tmp <- sigma_tmp+(moy_moyenne_1-data_80_14$`Température moyenne`[j])^2
         
 }
-sigma_moy_1 <- sigma_tmp/(nrow(data_80_14)-1)
+sigma_moy_1 <- sqrt(sigma_tmp/(nrow(data_80_14)-1))
 
 #Moyenne de la température minimale
 moy_min_1 <- mean(data_80_14$`temp_minimale`)
@@ -61,7 +61,7 @@ for(j in 1:nrow(data_80_14))
         sigma_tmp <- sigma_tmp+(moy_min_1-data_80_14$`temp_minimale`[j])^2
         
 }
-sigma_min_1 <- sigma_tmp/(nrow(data_80_14)-1)
+sigma_min_1 <- sqrt(sigma_tmp/(nrow(data_80_14)-1))
 
 #-------DEUXIEME ECHANTILLON: 2015 - 2019 -------#
 #On fait pareil avec le deuxième échantillon
@@ -91,11 +91,11 @@ moy_max_2 <- mean(data_15_19$`Température maximale`)
 sigma_tmp <- 0
 for(j in 1:nrow(data_15_19))
 {
-        sigma_tmp <- sigma_tmp + (moy_max_1-data_15_19$`Température maximale`[j])^2
+        sigma_tmp <- sigma_tmp + (data_15_19$`Température maximale`[j]-moy_max_2)^2
         
 }
-sigma_max_2 <- sigma_tmp/(nrow(data_15_19)-1)
-
+sigma_max_2 <- sqrt(sigma_tmp/(nrow(data_15_19)-1))
+print(data_15_19$`Température maximale`)
 
 #Moyenne de la température moyenne
 moy_moyenne_2 <- mean(data_15_19$`Température moyenne`)
@@ -104,10 +104,10 @@ moy_moyenne_2 <- mean(data_15_19$`Température moyenne`)
 sigma_tmp <- 0
 for(j in 1:nrow(data_15_19))
 {
-        sigma_tmp <- sigma_tmp+(moy_moyenne_1-data_15_19$`Température moyenne`[j])^2
+        sigma_tmp <- eval.parent(substitute(sigma_tmp+(moy_moyenne_1-data_15_19$`Température moyenne`[j])^2))
         
 }
-sigma_moy_2 <- sigma_tmp/(nrow(data_15_19)-1)
+sigma_moy_2 <- sqrt(sigma_tmp/(nrow(data_15_19)-1))
 
 #Moyenne de la température minimale
 moy_min_2 <- mean(data_15_19$`temp_minimale`)
@@ -119,14 +119,40 @@ for(j in 1:nrow(data_15_19))
         sigma_tmp <- sigma_tmp+(moy_min_1-data_15_19$`temp_minimale`[j])^2
         
 }
-sigma_min_2 <- sigma_tmp/(nrow(data_15_19)-1)
+sigma_min_2 <- sqrt(sigma_tmp/(nrow(data_15_19)-1))
+
+#----------- COMPARAISON DES MOYENNES ----------------#
+print("Moyennes pour l'échantillon 1: ")
+print(paste0("Température minimale: ", moy_min_1))
+print(paste0("Température moyenne: ", moy_moyenne_1))
+print(paste0("Température maximale: ", moy_max_1))
+
+print("Moyennes pour l'échantillon 2: ")
+print(paste0("Température minimale: ", moy_min_2))
+print(paste0("Température moyenne: ", moy_moyenne_2))
+print(paste0("Température maximale: ", moy_max_2))
+
+#---------------- COMPARAISON DES ECARTS TYPE ----------#
+print("Ecarts type pour l'échantillon 1: ")
+print(paste0("Température minimale: ", sigma_min_1))
+print(paste0("Température moyenne: ", sigma_moy_1))
+print(paste0("Température maximale: ", sigma_max_1))
+
+print("Ecarts type pour l'échantillon 2: ")
+print(paste0("Température minimale: ", sigma_min_2))
+print(paste0("Température moyenne: ", sigma_moy_2))
+print(paste0("Température maximale: ", sigma_max_2))
+
+sigma_essai=sd(data_15_19$`Température maximale`)
+print(paste0("ESSAI FONCTION SD ", sigma_essai))
+      print(sigma_essai)
 
 
-#Partie avec les graphes (A TERMINER)
+#---------- Partie avec les graphes (A TERMINER) -------------#
 temp_maximale=data_80_14$`Température maximale`
 temp_moy=data_80_14$`Température moyenne`
 
-#Corrélation entre les 3 variables de température
+#Corrélation entre les 3 variables de température, pour l'échantillon 1
 plot(data_80_14$temp_minimale,
      type="l",
      # 2.
@@ -140,3 +166,56 @@ lines(temp_maximale, type="l",col="red")
 lines(temp_moy, type="l",col="green")
 legend("bottomleft", legend = c("Température minimale", "Température moyenne", "Température maximale"),
        col = c("blue", "green", "red"), lty = 1:2, cex = 0.8)
+
+#Corrélation entre les 3 variables de température, pour l'échantillon 2
+plot(data_15_19$temp_minimale,
+     type="l",
+     # 2.
+     main="Corrélation entre les 3 variables statistiques",
+     # 3.
+     xlab="Nombre de mesures",
+     ylab="Température (Farhenheit)",
+     col="blue"
+)
+lines(data_15_19$`Température maximale`, type="l",col="red")
+lines(data_15_19$`Température moyenne`, type="l",col="green")
+legend("bottomleft", legend = c("Température minimale", "Température moyenne", "Température maximale"),
+       col = c("blue", "green", "red"), lty = 1:2, cex = 0.8)
+
+#Comparaison des moyennes entre les 2 échantillons
+plot(moy_min_1,
+     type="b",
+     # 2.
+     main="Comparaison des moyennes entre les 2 échantillons",
+     # 3.
+     ylab="Température (Farhenheit)",
+     col="red",
+     ylim = c(10, 70)
+)
+
+lines(moy_moyenne_1, type="b",col="red")
+lines(moy_max_1, type="b",col="red")
+lines(moy_min_2, type="b",col="blue")
+lines(moy_moyenne_2, type="b",col="blue")
+lines(moy_max_2, type="b",col="blue")
+legend("bottomleft", legend = c("Moyennes sur échantillon 1", "Moyennes sur échantillon 2"),
+       col = c("red", "blue"), lty = 1:2, cex = 0.8)
+
+#Comparaison des écarts type entre les 2 échantillons
+plot(sigma_min_1,
+     type="b",
+     # 2.
+     main="Comparaison des écarts type entre les 2 échantillons",
+     # 3.
+     ylab="Température (Farhenheit)",
+     col="red",
+     ylim = c(10, 20)
+)
+
+lines(sigma_moy_1, type="b",col="red")
+lines(sigma_max_1, type="b",col="red")
+lines(sigma_min_2, type="b",col="blue")
+lines(sigma_moy_2, type="b",col="blue")
+lines(sigma_max_2, type="b",col="blue")
+legend("bottomleft", legend = c("Moyennes sur échantillon 1", "Moyennes sur échantillon 2"),
+       col = c("red", "blue"), lty = 1:2, cex = 0.8)
