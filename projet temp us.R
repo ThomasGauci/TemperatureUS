@@ -1,20 +1,23 @@
 #États choisis: Californie, Louisiana, Ohio, Minnesota, Montana
-
 setwd(dirname(rstudioapi::getActiveDocumentContext()$path))
+#List all CSV Files in a Directory/Folder
 ech_80_14_files = list.files("CSV/Echantillon 1", pattern="*.csv", full.names=TRUE)
 ech_15_19_files = list.files("CSV/Echantillon 2", pattern="*.csv", full.names=TRUE)
 
 #-------PREMIER ECHANTILLON: 1980 - 2014 -------#
 #On crée le premier échantillon
-data_tmp <- lapply(ech_80_14_files,function(i){
+data_tmp <- lapply(ech_80_14_files, function(i){
         read.csv(i, header=FALSE, skip=4)
 })
 
-# V17: moyenne V18: max V25: Nom de l'Etat
+# V17: moyenne; V18: max; V25: Nom de l'Etat;
 df <- do.call(rbind.data.frame, data_tmp)
 head(df)
-data_80_14=subset(df, V25=="California" | V25=="Louisiana" | V25=="Ohio" | V25=="Minnesota" | V25=="Montana")
+#Sélection des colonnes pertinentes
 data_80_14 <- data_80_14[,c("V25", "V18", "V17")]
+#Sélection des données des Etats qui nous intéressent
+data_80_14=subset(df, V25=="California" | V25=="Louisiana" | V25=="Ohio" | V25=="Minnesota" | V25=="Montana")
+#Renommage des colonnes
 colnames(data_80_14)[1] <- "État"
 colnames(data_80_14)[2] <- "Température maximale"
 colnames(data_80_14)[3] <- "Température moyenne"
@@ -22,6 +25,9 @@ colnames(data_80_14)[3] <- "Température moyenne"
 #Comme la moyenne est une moyenne arithmétique, on peut déterminer
 #la température minimale à partir de la moyenne et de la température
 #maximale
+#Moy = (Min+Max)/2
+#2*Moy = Min+Max
+#2*Moy-Max = Min
 temp_minimale=2*data_80_14$`Température moyenne`-data_80_14$`Température maximale`
 data_80_14$temp_minimale=temp_minimale
 
@@ -36,6 +42,7 @@ for(j in 1:nrow(data_80_14))
  sigma_tmp <- sigma_tmp + (moy_max_1-data_80_14$`Température maximale`[j])^2
         
 }
+#écart-type = racine carré de la variance
 sigma_max_1 <- sqrt(sigma_tmp/(nrow(data_80_14)-1))
 
 
@@ -148,7 +155,7 @@ print(paste0("ESSAI FONCTION SD ", sigma_essai))
       print(sigma_essai)
 
 
-#---------- Partie avec les graphes (A TERMINER) -------------#
+#---------- Partie avec les graphes -------------#
 temp_maximale=data_80_14$`Température maximale`
 temp_moy=data_80_14$`Température moyenne`
 
